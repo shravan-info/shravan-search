@@ -1,36 +1,36 @@
 # Shravan Search
 
-A small experimental search engine prototype. It crawls up to **100 public web pages** and stores only three fields: title, description and URL.
+A frontend-only job discovery website inspired by clean answer and search interfaces.
 
-## Files
-- `index.html` — static search interface
-- `crawler.py` — Python crawler
-- `data.json` — generated search index
-- `.github/workflows/crawl.yml` — manual and weekly crawler workflow
+## Stack
+- HTML, CSS and vanilla JavaScript
+- Static JSON directory: jobs.json
+- GitHub Pages or Cloudflare Pages hosting
+- No backend, database, API key, login or server function
+
+## Features
+- Search across a curated directory of official employer career pages and established job platforms
+- Location, field and experience filters
+- Search suggestions and popular searches
+- Responsive layout for mobile and desktop
+- Dark/light theme preference saved in the browser
+- External source links open safely in a new tab
 
 ## Run locally
-Requires Python 3.10+.
+Because the site loads jobs.json with fetch, run it through a local static server rather than opening index.html as a file. For example, use the VS Code Live Server extension or Python's built-in static server:
 
-```bash
-python crawler.py
-```
+    python -m http.server 8000
 
-The crawler writes `data.json`. It uses an identifiable User-Agent, checks each host's `robots.txt`, stays within configured seed hosts, waits between requests to the same host, and stops at 100 pages. Hosts whose robots.txt cannot be read are skipped.
+Then visit http://localhost:8000.
 
-## Run on GitHub
-1. Open the **Actions** tab.
-2. Select **ShravanBot – Crawl up to 100 pages**.
-3. Select **Run workflow**.
-4. The updated `data.json` is committed automatically.
+## Update career sources
+Edit jobs.json. Each entry is a career-source directory record, not a confirmed job vacancy. Keep the official source URL, description and tags accurate. Do not label a company or vacancy as verified unless it has actually been checked.
 
-The workflow also runs weekly. GitHub Actions usage is subject to GitHub plan limits; this is not unlimited crawling.
+## Important limitation
+This static version searches only the career sources stored in jobs.json. It does not crawl the whole internet, fetch live vacancies, accept applications, verify employers, or guarantee employment. Visitors must check current openings, eligibility, deadlines and application requirements on the original website.
 
-## Publish the search website
-In repository **Settings → Pages**, select **Deploy from a branch**, choose `main` and `/(root)`, then save.
+## Deployment
+- GitHub Pages: Settings → Pages → Deploy from a branch → main → / (root).
+- Cloudflare Pages: Connect this repository, use the main branch, leave the build command empty, and set the output directory to /.
 
-The site URL will be `https://shravan-info.github.io/shravan-search/`.
-
-The search page loads the small `data.json` index and searches it in the browser. With this prototype capped at 100 records, that is lightweight.
-
-## Important
-This is a learning prototype, not a full-web search engine. Crawl only public pages, respect robots.txt and website terms, keep request rates low, and do not treat snippets as verified facts. Some sites may block automated access or return fewer than 100 pages.
+No build step is required.

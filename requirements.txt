@@ -1,1 +1,0 @@
-# ShravanBot uses only Python standard library.
