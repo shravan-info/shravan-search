@@ -1,4 +1,102 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8fa"><title>Shravan Maps</title><meta name="description" content="Shravan Maps — an independently built map engine prototype."><link rel="stylesheet" href="style.css"></head>
-<body><header class="topbar"><a class="brand" href="./"><span class="brand-mark">S</span><span><strong>SHRAVAN MAPS</strong><small>Independent map engine · Prototype 0.1</small></span></a><form id="searchForm" class="search"><input id="searchInput" type="search" placeholder="Search a city (Pune, Mumbai…)" autocomplete="off"><button type="submit">Search</button></form><button id="resetBtn" class="secondary">Reset view</button></header>
-<main><aside class="panel"><h1>Explore Maharashtra</h1><p class="muted">A first renderer test using a small, hand-authored sample dataset.</p><div class="status"><span class="dot"></span><span id="statusText">Map engine ready</span></div><h2>Places</h2><div id="placeList" class="place-list"></div><div class="notice"><strong>Prototype data</strong><br>This is a simplified demonstration map, not a survey-accurate map or navigation product. Real geographic datasets and their licenses will be added in a later stage.</div><footer>Built from scratch with HTML, CSS, Canvas and JavaScript.</footer></aside><section class="map-wrap" aria-label="Interactive map"><canvas id="mapCanvas"></canvas><div class="map-controls"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div><div class="map-hint">Drag to pan · Scroll or use + / − to zoom</div><div class="scale">Illustrative view</div></section></main><script src="js/map-engine.js"></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef3f8"><meta name="description" content="SHRAVAN MAPS — a standalone vector map engine built with Canvas and vanilla JavaScript.">
+<title>SHRAVAN MAPS — Vector Engine</title>
+<style>
+:root{color-scheme:light;--ink:#182536;--muted:#66778a;--glass:rgba(255,255,255,.88);--line:rgba(35,55,75,.13);--accent:#1769e0;--shadow:0 12px 36px rgba(35,54,75,.15)}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}body{background:#e8eef3}#map{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}#map.dragging{cursor:grabbing}
+.topbar{position:absolute;top:max(18px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(650px,calc(100% - 28px));z-index:5;display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--glass);border:1px solid rgba(255,255,255,.85);border-radius:18px;box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.brand{display:flex;align-items:center;gap:9px;white-space:nowrap;font-size:14px;font-weight:850;letter-spacing:.06em}.brandmark{width:34px;height:34px;border-radius:11px;background:#1769e0;display:grid;place-items:center;color:white}
+.searchwrap{position:relative;flex:1;min-width:0}.searchrow{display:flex;align-items:center;gap:9px}.searchrow svg{flex:none;color:#718196}.searchrow input{width:100%;border:0;outline:0;background:transparent;font:500 14px inherit;color:var(--ink);min-width:0;padding:8px 0}.searchrow input::placeholder{color:#8492a2}
+.suggestions{position:absolute;top:calc(100% + 14px);left:-8px;right:-8px;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;display:none;max-height: min(55vh,360px);overflow:auto}.suggestions.open{display:block}.suggestion{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;text-align:left;padding:10px;border-radius:10px;color:var(--ink);cursor:pointer}.suggestion:hover,.suggestion:focus{background:#edf4ff;outline:0}.sicon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#eaf2ff;color:#1769e0}.suggestion small{display:block;color:var(--muted);margin-top:2px}
+.status{position:absolute;left:18px;bottom:max(18px,env(safe-area-inset-bottom));z-index:3;background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border:1px solid white;border-radius:12px;padding:9px 12px;font-size:11px;color:#657589;box-shadow:0 5px 18px #20344a12}
+.controls{position:absolute;right:18px;bottom:max(18px,env(safe-area-inset-bottom));z-index:4;display:grid;gap:9px}.controlgroup{display:grid;background:var(--glass);border:1px solid white;border-radius:14px;overflow:hidden;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.control{width:44px;height:44px;border:0;background:transparent;color:#31445a;font-size:22px;cursor:pointer;display:grid;place-items:center}.control:hover{background:#edf4ff;color:var(--accent)}.control+ .control{border-top:1px solid var(--line)}.control svg{width:19px;height:19px}
+.popup{position:absolute;z-index:6;display:none;min-width:190px;max-width:260px;padding:13px 15px;background:rgba(255,255,255,.96);border:1px solid white;border-radius:14px;box-shadow:var(--shadow);pointer-events:none;backdrop-filter:blur(14px)}.popup.show{display:block}.popup strong{display:block;font-size:14px;margin-bottom:4px}.popup span{font-size:12px;color:var(--muted);line-height:1.45}.popup .tag{display:inline-block;margin-top:8px;padding:4px 7px;border-radius:6px;background:#eaf2ff;color:#1769e0;font-size:10px;font-weight:700}
+@media(max-width:560px){.topbar{gap:9px;padding:9px 11px;border-radius:16px}.brand{font-size:11px;gap:6px}.brandmark{width:30px;height:30px}.status{font-size:10px;left:10px;bottom:12px}.controls{right:10px;bottom:12px}.control{width:40px;height:40px}}
+</style>
+</head>
+<body>
+<canvas id="map" aria-label="Interactive vector map of a fictionalized Maharashtra region"></canvas>
+<header class="topbar">
+ <div class="brand"><span class="brandmark"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6.5 9 3l6 3.5L21 3v14.5L15 21l-6-3.5L3 21z"/><path d="M9 3v14.5M15 6.5V21"/></svg></span><span>SHRAVAN MAPS</span></div>
+ <div class="searchwrap"><div class="searchrow"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="search" type="search" autocomplete="off" placeholder="Search cities and places…" aria-label="Search places"></div><div class="suggestions" id="suggestions" role="listbox"></div></div>
+</header>
+<div class="popup" id="popup"><strong></strong><span></span><div class="tag"></div></div>
+<div class="status">VECTOR DEMO · MAHARASHTRA REGION · NOT FOR NAVIGATION</div>
+<div class="controls"><div class="controlgroup"><button class="control" id="plus" aria-label="Zoom in">+</button><button class="control" id="minus" aria-label="Zoom out">−</button></div><div class="controlgroup"><button class="control" id="reset" aria-label="Reset map view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11a9 9 0 1 1 2.6 6.4M3 4v7h7"/></svg></button></div></div>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('map'),ctx=canvas.getContext('2d',{alpha:false});
+const search=document.getElementById('search'),suggestions=document.getElementById('suggestions'),popup=document.getElementById('popup');
+const W=1000,H=760;
+const state={x:0,y:0,zoom:1,minZoom:.55,maxZoom:5,dpr:1,drag:false,lastX:0,lastY:0,hover:null,selected:null,raf:0,anim:null};
+const data={
+ polygons:[
+  {id:'land',kind:'polygon',points:[[90,160],[180,110],[290,125],[365,85],[470,120],[555,95],[650,140],[760,130],[860,195],[920,300],[875,390],[900,500],[820,590],[700,625],[610,690],[500,650],[405,690],[300,625],[210,630],[145,550],[100,445],[65,330]],fill:'#e6eddf',stroke:'#c6d2c1',width:3},
+  {id:'water-west',kind:'polygon',points:[[0,0],[105,0],[100,155],[72,245],[82,340],[110,440],[130,550],[205,760],[0,760]],fill:'#cce5ef',stroke:'#b6d7e5',width:1},
+  {id:'lake',kind:'polygon',points:[[610,230],[660,210],[700,235],[690,275],[645,285],[615,260]],fill:'#c6e4ed',stroke:'#a8d2e0',width:2}
+ ],
+ lines:[
+  {id:'coast',kind:'line',points:[[105,0],[100,155],[72,245],[82,340],[110,440],[130,550],[205,760]],stroke:'#a8cfdf',width:3},
+  {id:'river1',kind:'line',points:[[160,310],[260,330],[350,350],[430,340],[520,370],[620,360],[730,390],[840,420]],stroke:'#82c4d8',width:5},
+  {id:'river2',kind:'line',points:[[430,340],[450,270],[500,220],[540,170],[590,140]],stroke:'#9acddd',width:3},
+  {id:'highway1',kind:'line',points:[[160,310],[270,250],[390,230],[520,260],[650,310],[790,350],[850,420]],stroke:'#f2a85f',width:5,dash:[]},
+  {id:'highway2',kind:'line',points:[[270,250],[320,370],[390,480],[500,550],[650,580],[760,530]],stroke:'#f2a85f',width:4},
+  {id:'road1',kind:'line',points:[[390,230],[430,340],[500,430],[650,580]],stroke:'#fff',width:3},
+  {id:'road2',kind:'line',points:[[160,310],[260,420],[390,480],[520,500],[700,470],[850,420]],stroke:'#fff',width:3},
+  {id:'road3',kind:'line',points:[[520,260],[540,390],[520,500],[500,550]],stroke:'#fff',width:2.5},
+  {id:'road4',kind:'line',points:[[650,310],[700,390],[700,470],[760,530]],stroke:'#fff',width:2.5}
+ ],
+ pois:[
+  {id:'mumbai',name:'Mumbai',category:'City',info:'Coastal capital city of Maharashtra.',x:160,y:310},
+  {id:'pune',name:'Pune',category:'City',info:'Major education and technology centre.',x:390,y:230},
+  {id:'nashik',name:'Nashik',category:'City',info:'Known for vineyards and the Godavari river.',x:430,y:340},
+  {id:'sambhajinagar',name:'Chhatrapati Sambhajinagar',category:'City',info:'Historic city in the Marathwada region.',x:520,y:260},
+  {id:'nagpur',name:'Nagpur',category:'City',info:'Major city in eastern Maharashtra.',x:790,y:350},
+  {id:'kolhapur',name:'Kolhapur',category:'City',info:'Historic city in south-west Maharashtra.',x:320,y:540},
+  {id:'solapur',name:'Solapur',category:'City',info:'An important city in south-eastern Maharashtra.',x:650,y:580},
+  {id:'ratnagiri',name:'Ratnagiri',category:'Coastal town',info:'Konkan coastal town on the Arabian Sea.',x:205,y:485},
+  {id:'mahabaleshwar',name:'Mahabaleshwar',category:'Hill station',info:'Popular hill station in the Sahyadri range.',x:285,y:410},
+  {id:'tadoba',name:'Tadoba',category:'National park',info:'A well-known tiger reserve in Maharashtra.',x:855,y:260}
+ ]
+};
+const allPois=data.pois;
+function resize(){const r=canvas.getBoundingClientRect();state.dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*state.dpr);canvas.height=Math.round(r.height*state.dpr);requestRender()}
+function screenFromWorld(x,y){const w=canvas.clientWidth,h=canvas.clientHeight;return{x:(x-W/2)*state.zoom+w/2+state.x,y:(y-H/2)*state.zoom+h/2+state.y}}
+function worldFromScreen(x,y){const w=canvas.clientWidth,h=canvas.clientHeight;return{x:(x-w/2-state.x)/state.zoom+W/2,y:(y-h/2-state.y)/state.zoom+H/2}}
+function requestRender(){if(!state.raf)state.raf=requestAnimationFrame(render)}
+function path(points,close=false){ctx.beginPath();points.forEach((p,i)=>{const q=screenFromWorld(p[0],p[1]);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});if(close)ctx.closePath()}
+function render(){state.raf=0;const w=canvas.clientWidth,h=canvas.clientHeight;ctx.setTransform(state.dpr,0,0,state.dpr,0,0);ctx.fillStyle='#dceaf0';ctx.fillRect(0,0,w,h);
+ // subtle geographic grid
+ ctx.save();ctx.strokeStyle='rgba(93,139,157,.13)';ctx.lineWidth=1;const step=80*state.zoom;const ox=((w/2+state.x-(W/2)*state.zoom)%step+step)%step,oy=((h/2+state.y-(H/2)*state.zoom)%step+step)%step;for(let x=ox;x<w;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=oy;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}ctx.restore();
+ for(const f of data.polygons){path(f.points,true);ctx.fillStyle=f.fill;ctx.fill();ctx.strokeStyle=f.stroke;ctx.lineWidth=f.width*state.zoom;ctx.stroke()}
+ for(const f of data.lines){path(f.points);ctx.strokeStyle=f.stroke;ctx.lineWidth=Math.max(1,f.width*state.zoom);ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash((f.dash||[]).map(v=>v*state.zoom));ctx.stroke()}ctx.setLineDash([]);
+ // map labels
+ ctx.textAlign='center';ctx.fillStyle='#8a9b91';ctx.font='600 '+Math.max(10,13*state.zoom)+'px system-ui';const region=screenFromWorld(510,455);ctx.fillText('MAHARASHTRA',region.x,region.y);
+ for(const p of allPois)drawPoi(p);
+}
+function drawPoi(p){const q=screenFromWorld(p.x,p.y),active=state.selected===p.id,hover=state.hover===p.id,r=(active||hover?10:7.5)*Math.min(1.4,Math.max(.85,state.zoom));
+ ctx.save();ctx.shadowColor='rgba(31,66,102,.22)';ctx.shadowBlur=8;ctx.shadowOffsetY=2;ctx.beginPath();ctx.arc(q.x,q.y,r+3,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.shadowColor='transparent';ctx.beginPath();ctx.arc(q.x,q.y,r,0,Math.PI*2);ctx.fillStyle=active?'#f28a35':hover?'#0d58c7':'#1769e0';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();ctx.restore();
+ if(state.zoom>.72||active||hover){ctx.font=(active?'700 ':'600 ')+Math.max(10,12*state.zoom)+'px system-ui';ctx.textAlign='left';ctx.lineWidth=3.5;ctx.strokeStyle='rgba(255,255,255,.9)';ctx.fillStyle='#34475a';const label=p.name.length>23?p.name.slice(0,21)+'…':p.name;ctx.strokeText(label,q.x+11,q.y-9);ctx.fillText(label,q.x+11,q.y-9)}
+}
+function pick(x,y){let best=null,dist=Infinity;for(const p of allPois){const q=screenFromWorld(p.x,p.y),d=Math.hypot(q.x-x,q.y-y);if(d<19&&d<dist){best=p;dist=d}}return best}
+function showPopup(p,x,y){popup.querySelector('strong').textContent=p.name;popup.querySelector('span').textContent=p.info;popup.querySelector('.tag').textContent=p.category;popup.classList.add('show');const pad=12;const left=Math.max(pad,Math.min(innerWidth-270,x+16)),top=Math.max(75,Math.min(innerHeight-130,y-20));popup.style.left=left+'px';popup.style.top=top+'px'}
+function hidePopup(){popup.classList.remove('show')}
+function panTo(p){state.selected=p.id;state.anim={fromX:state.x,fromY:state.y,toX:-(p.x-W/2)*state.zoom,toY:-(p.y-H/2)*state.zoom,start:performance.now(),duration:550};requestRender()}
+function animate(){if(!state.anim)return;const a=state.anim,t=Math.min(1,(performance.now()-a.start)/a.duration),e=1-Math.pow(1-t,3);state.x=a.fromX+(a.toX-a.fromX)*e;state.y=a.fromY+(a.toY-a.fromY)*e;if(t>=1)state.anim=null;requestRender();if(state.anim)requestAnimationFrame(animate)}
+function zoomAt(factor,x=canvas.clientWidth/2,y=canvas.clientHeight/2){const before=worldFromScreen(x,y);state.zoom=Math.max(state.minZoom,Math.min(state.maxZoom,state.zoom*factor));const after=screenFromWorld(before.x,before.y);state.x+=x-after.x;state.y+=y-after.y;state.anim=null;requestRender()}
+canvas.addEventListener('pointerdown',e=>{state.drag=true;state.anim=null;state.lastX=e.clientX;state.lastY=e.clientY;canvas.classList.add('dragging');canvas.setPointerCapture(e.pointerId);hidePopup()});
+canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;if(state.drag){state.x+=e.clientX-state.lastX;state.y+=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;requestRender()}else{const p=pick(x,y);state.hover=p?.id||null;canvas.style.cursor=p?'pointer':'grab';requestRender()}});
+function endDrag(){state.drag=false;canvas.classList.remove('dragging')}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
+canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),p=pick(e.clientX-r.left,e.clientY-r.top);if(p){state.selected=p.id;showPopup(p,e.clientX-r.left,e.clientY-r.top);requestRender()}else{state.selected=null;hidePopup();requestRender()}});
+canvas.addEventListener('wheel',e=>{e.preventDefault();const r=canvas.getBoundingClientRect();zoomAt(e.deltaY<0?1.14:1/1.14,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+document.getElementById('plus').onclick=()=>zoomAt(1.25);document.getElementById('minus').onclick=()=>zoomAt(1/1.25);document.getElementById('reset').onclick=()=>{state.zoom=1;state.x=0;state.y=0;state.selected=null;hidePopup();requestRender()};
+function renderSuggestions(query){const q=query.trim().toLowerCase();suggestions.innerHTML='';if(!q){suggestions.classList.remove('open');return}const matches=allPois.filter(p=>(p.name+' '+p.category).toLowerCase().includes(q)).slice(0,7);if(!matches.length){suggestions.classList.remove('open');return}for(const p of matches){const b=document.createElement('button');b.className='suggestion';b.type='button';b.innerHTML='<span class="sicon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span></span>';b.querySelector('span:last-child').append(document.createTextNode(p.name));const small=document.createElement('small');small.textContent=p.category;b.querySelector('span:last-child').append(small);b.onclick=()=>{search.value=p.name;suggestions.classList.remove('open');panTo(p);requestAnimationFrame(animate);showPopup(p,innerWidth/2,innerHeight/2)};suggestions.append(b)}suggestions.classList.add('open')}
+search.addEventListener('input',()=>renderSuggestions(search.value));search.addEventListener('focus',()=>renderSuggestions(search.value));search.addEventListener('keydown',e=>{if(e.key==='Escape')suggestions.classList.remove('open');if(e.key==='Enter'){const p=allPois.find(v=>v.name.toLowerCase()===search.value.trim().toLowerCase())||allPois.find(v=>v.name.toLowerCase().includes(search.value.trim().toLowerCase()));if(p){suggestions.classList.remove('open');panTo(p);requestAnimationFrame(animate)}}});
+document.addEventListener('click',e=>{if(!e.target.closest('.searchwrap'))suggestions.classList.remove('open')});window.addEventListener('resize',resize);resize();state.x=0;state.y=0;
+})();
+</script>
+</body></html>
