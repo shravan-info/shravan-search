@@ -1,0 +1,53 @@
+{
+  "note": "Simplified demo geometry; not navigation-grade.",
+  "cities": [
+    {
+      "name": "Mumbai",
+      "kind": "Capital city",
+      "longitude": 72.8777,
+      "latitude": 19.076
+    },
+    {
+      "name": "Pune",
+      "kind": "Major city",
+      "longitude": 73.8567,
+      "latitude": 18.5204
+    },
+    {
+      "name": "Nashik",
+      "kind": "Major city",
+      "longitude": 73.7898,
+      "latitude": 19.9975
+    },
+    {
+      "name": "Chhatrapati Sambhajinagar",
+      "kind": "Major city",
+      "longitude": 75.3433,
+      "latitude": 19.8762
+    },
+    {
+      "name": "Kolhapur",
+      "kind": "City",
+      "longitude": 74.2433,
+      "latitude": 16.705
+    },
+    {
+      "name": "Nagpur",
+      "kind": "Major city",
+      "longitude": 79.0882,
+      "latitude": 21.1458
+    },
+    {
+      "name": "Solapur",
+      "kind": "City",
+      "longitude": 75.9064,
+      "latitude": 17.6599
+    },
+    {
+      "name": "Ratnagiri",
+      "kind": "Coastal city",
+      "longitude": 73.312,
+      "latitude": 16.9902
+    }
+  ]
+}

@@ -1,36 +1,26 @@
-# Shravan Search
+# SHRAVAN MAPS
 
-A frontend-only job discovery website inspired by clean answer and search interfaces.
-
-## Stack
-- HTML, CSS and vanilla JavaScript
-- Static JSON directory: jobs.json
-- GitHub Pages or Cloudflare Pages hosting
-- No backend, database, API key, login or server function
+An original, from-scratch map-renderer prototype.
 
 ## Features
-- Search across a curated directory of official employer career pages and established job platforms
-- Location, field and experience filters
-- Search suggestions and popular searches
-- Responsive layout for mobile and desktop
-- Dark/light theme preference saved in the browser
-- External source links open safely in a new tab
+- Canvas-based renderer (no third-party map renderer)
+- Pan and zoom
+- Searchable sample of eight Maharashtra cities
+- Responsive interface
+- No API key, build step, or external JavaScript library
 
 ## Run locally
-Because the site loads jobs.json with fetch, run it through a local static server rather than opening index.html as a file. For example, use the VS Code Live Server extension or Python's built-in static server:
+Open `index.html` in a modern browser.
 
-    python -m http.server 8000
+## Accuracy notice
+The region outline and interior lines are simplified demo geometry. City coordinates are approximate. This is not a survey-accurate map or a navigation product. Do not use it for travel or safety decisions.
 
-Then visit http://localhost:8000.
+## Roadmap
+1. Add verified, license-compliant geographic data.
+2. Design a compact geographic data format and spatial index.
+3. Add roads, water, boundaries, and labels.
+4. Build our own place search.
+5. Develop routing after a verified road network is available.
 
-## Update career sources
-Edit jobs.json. Each entry is a career-source directory record, not a confirmed job vacancy. Keep the official source URL, description and tags accurate. Do not label a company or vacancy as verified unless it has actually been checked.
-
-## Important limitation
-This static version searches only the career sources stored in jobs.json. It does not crawl the whole internet, fetch live vacancies, accept applications, verify employers, or guarantee employment. Visitors must check current openings, eligibility, deadlines and application requirements on the original website.
-
-## Deployment
-- GitHub Pages: Settings → Pages → Deploy from a branch → main → / (root).
-- Cloudflare Pages: Connect this repository, use the main branch, leave the build command empty, and set the output directory to /.
-
-No build step is required.
+## Data policy
+The renderer and application logic are original. Any future external geographic data must be reviewed for attribution, redistribution, and license requirements before inclusion.
