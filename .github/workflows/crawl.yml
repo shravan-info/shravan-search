@@ -1,0 +1,31 @@
+name: ShravanBot - Crawl up to 100 pages
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 2 * * 0"
+permissions:
+  contents: write
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run ShravanBot
+        run: python crawler.py
+      - name: Commit updated search index
+        run: |
+          if git diff --quiet -- data.json; then
+            echo "Search index has not changed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git commit -m "Update Shravan Search index"
+          git push
